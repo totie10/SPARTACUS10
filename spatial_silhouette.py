@@ -9,7 +9,7 @@ import numpy as np
 import scipy.spatial.distance as distance
 from sklearn.decomposition import PCA
 
-def silhouette_width_index(X, labels, metric = "euclidean", iter_max = 20000,
+def silhouette_coefficient(X, labels, metric = "euclidean", iter_max = 20000,
                            return_vec_sil = False):
     """
     Calculates silhouette coefficient. For large data sets, pairwise distance 
@@ -44,11 +44,27 @@ def silhouette_width_index(X, labels, metric = "euclidean", iter_max = 20000,
 
     Returns
     -------
-    silhouette_coefficient : scalar
+    SC : scalar
         The silhouette coefficient.
     vec_s : ndarray, shape (V,)
         If return_vec_sil = True, the silhouette width of all single variables 
         is additionally returned.
+    
+    Examples
+    --------
+    Random input data with 100 variables and a partition assigning each variable
+    to one of in total four clusters:
+        
+    >>> X = np.random.normal(size = (50, 100))
+    >>> labels = np.random.randint(1, 5, 100)
+    >>> silhouette_coefficient(X, labels, metric = "euclidean")   
+    -0.0171145
+    
+    References
+    ----------
+    Rousseeuw PJ (1987) Silhouettes: a graphical aid to the interpretation and 
+        validation of cluster analysis. Journal of computational and applied 
+        mathematics 20:53-65
         
     """
     # Determine labels indicating different clusters
@@ -139,16 +155,16 @@ def silhouette_width_index(X, labels, metric = "euclidean", iter_max = 20000,
         # Update vec_s
         vec_s = np.append(vec_s, vec_s_l)
     # Return silhouette index
-    silhouette_coefficient = np.mean(vec_s)
+    SC = np.mean(vec_s)
     if return_vec_sil:
-        return silhouette_coefficient, vec_s
+        return SC, vec_s
     else:
-        return silhouette_coefficient
+        return SC
 
-def simplified_silhouette_width_index(X, labels, metric = "euclidean",
+def simplified_silhouette_coefficient(X, labels, metric = "euclidean",
                                       return_vec_sil = False):
     """
-    Calculates simplified silhouette coefficient. For large data sets, pairwise 
+    Calculates simplified silhouette coefficient (SSC). For large data sets, pairwise 
     distance calculation is performed in portions. Therefore, in contrast to, e.g., 
     sklearn.metrics.silhouette_score, this function does not run into a memory
     error, if the number of objects to be clustered is very large. 
@@ -174,11 +190,33 @@ def simplified_silhouette_width_index(X, labels, metric = "euclidean",
 
     Returns
     -------
-    simplified_silhouette_coefficient : scalar
-        The simplified silhouette coefficient.
+    SSC : scalar
+        The simplified silhouette coefficient (SSC).
     vec_s : ndarray, shape (V,)
-        If return_vec_sil = True, the silhouette width of all single variables 
-        is additionally returned.
+        If return_vec_sil = True, the SSC of all single variables is 
+        additionally returned.
+        
+    Notes
+    -----
+    The SSC using Euclidean or correlation distance is introduced by 
+    Vendramin et al. (2010) or Tietz et al. (2021), respectively. 
+     
+    Examples
+    --------
+    Random input data with 100 variables and a partition assigning each variable
+    to one of in total four clusters:
+        
+    >>> X = np.random.normal(size = (50, 100))
+    >>> labels = np.random.randint(1, 5, 100)
+    >>> simplified_silhouette_coefficient(X, labels, metric = "euclidean")   
+    0.01753568
+    
+    References
+    ----------
+    Vendramin L, Campello RJGB, Hruschka ER (2010) Relative clustering validity 
+        criteria: A comparative overview. Statistical analysis and data mining: 
+        the ASA data science journal 3(4):209-235
+    Tietz et al. (2021) (Publication in progress)
         
     """
     # Determine labels indicating different clusters
@@ -241,11 +279,11 @@ def simplified_silhouette_width_index(X, labels, metric = "euclidean",
         # Update vec_s
         vec_s = np.append(vec_s, vec_s_l)
     # Return simplified silhouette coefficient
-    simplified_silhouette_coefficient = np.mean(vec_s)
+    SSC = np.mean(vec_s)
     if return_vec_sil:
-        return simplified_silhouette_coefficient, vec_s
+        return SSC, vec_s
     else:
-        return simplified_silhouette_coefficient
+        return SSC
     
 def get_list_neighbors(matXYZ, diag_neighbor = False, print_progress = False):
     """
@@ -296,32 +334,71 @@ def get_list_neighbors(matXYZ, diag_neighbor = False, print_progress = False):
     return list_neighbors
 
 
-def silhouette_width_index_spatial(X, labels, list_neighbors = None, metric = "euclidean", 
+def silhouette_coefficient_spatial(X, labels, list_neighbors, metric = "euclidean", 
                                    iter_max = 20000, return_vec_sil = False):
     """
-    TODO How to generate list_neighbors
+    Calculates the spatial adaptation of the silhouette coefficient. 
 
     Parameters
     ----------
-    X : TYPE
-        DESCRIPTION.
-    labels : TYPE
-        DESCRIPTION.
-    list_neighbors : TYPE
-        DESCRIPTION.
-    metric : TYPE, optional
-        DESCRIPTION. The default is "euclidean".
-    iter_max : TYPE, optional
-        DESCRIPTION. The default is 20000.
-    return_vec_sil : TYPE, optional
-        DESCRIPTION. The default is False.
+    X : ndarray, shape(N, V)
+        Input matrix including, e.g., grey matter volume values, where N is 
+        the number of subjects and V is the number of variables, e.g. voxels. 
+        Note that the cluster objects are the variables and not the subjects.
+    labels : ndarray, shape (V,)
+        Array of integers, indicating the cluster labels of the variables.
+        Sorted as in the column of X, i.e. the j-th cluster label corresponds 
+        to the variable stored in the j-th column of X.
+    list_neighbors : list, length (V,)
+        List including the neighbor information of each variable, as returned
+        by the get_list_neighbors() function. The j-th entry must contain a 
+        numpy array with the indices of the neighbors of variable j, j=1,...,V. 
+        Note that it is recommended to calculate list_neighbors once for an 
+        input data set and to save it to the hard drive. Whenever a parcellation 
+        generated based on the input data should be evaluated using 
+        silhouette_coefficient_spatial(), list_neighbors can be loaded from the 
+        hard drive instead of being re-calculated, which is computationally 
+        expensive.
+    metric : str, optional
+        The distance metric between two variables. It is recommended to either
+        employ 'euclidean' (Euclidean distance) or 'correlation' (1-abs(corr)).
+        However, this function technically allows all distance metrics as 
+        implemented in ?scipy.spatial.distance.pdist. In the latter case, it is 
+        up to the user to ensure the validity of the chosen metric. The default 
+        is "euclidean".
+    iter_max : int, optional
+        In order to avoid a memory error, the pairwise variable distance 
+        calculation is partitioned, if at least one of the two clusters includes 
+        more than iter_max variables. The default is 20000.
+    return_vec_sil : bool, optional
+        Should the silhouette width of all single variables be returned in 
+        addition to the silhouette coefficient? The default is False.
 
     Returns
     -------
-    TYPE
-        DESCRIPTION.
-    TYPE
-        DESCRIPTION.
+    SC_spatial : scalar
+        The spatial silhouette coefficient.
+    vec_s : ndarray, shape (V,)
+        If return_vec_sil = True, the spatial silhouette coefficient of all 
+        single variables is additionally returned.
+     
+    Examples
+    --------
+    Random input data with 192 spatial variables on a 8x6x4 grid and a 
+    partition assigning each variable to one of in total four spatially
+    contiguous clusters:
+        
+    >>> X = np.random.normal(size = (50, 192))
+    >>> matXYZ = np.argwhere(np.zeros((8, 6, 4)) == 0)
+    >>> labels = np.repeat(np.array([1,2,3,4]), 2*6*4)
+    >>> list_neighbors = get_list_neighbors(matXYZ) # Best to save list_neighbors
+                                                    # to hard drive
+    >>> silhouette_coefficient_spatial(X, labels, list_neighbors, metric = "euclidean")   
+    -0.00466234
+    
+    References
+    ----------
+    Tietz et al. (2021) (Publication in progress.)
 
     """
     # Determine labels indicating different clusters
@@ -416,14 +493,81 @@ def silhouette_width_index_spatial(X, labels, list_neighbors = None, metric = "e
         vec_s_l = (vec_b - vec_a) / np.maximum(vec_a, vec_b)
         # Update vec_s
         vec_s = np.append(vec_s, vec_s_l)
-    # Return silhouette index
+    # Return spatial silhouette index
+    SC_spatial = np.mean(vec_s)
     if return_vec_sil:
-        return np.mean(vec_s), vec_s
+        return SC_spatial, vec_s
     else:
-        return np.mean(vec_s)
+        return SC_spatial
     
-def simplified_silhouette_width_index_spatial(X, labels, list_neighbors, metric = "euclidean",
+def simplified_silhouette_coefficient_spatial(X, labels, list_neighbors, metric = "euclidean",
                            return_vec_sil = False):
+    """
+    Calculates the spatial adaptation of the simplified silhouette coefficient. 
+
+    Parameters
+    ----------
+    X : ndarray, shape(N, V)
+        Input matrix including, e.g., grey matter volume values, where N is 
+        the number of subjects and V is the number of variables, e.g. voxels. 
+        Note that the cluster objects are the variables and not the subjects.
+    labels : ndarray, shape (V,)
+        Array of integers, indicating the cluster labels of the variables.
+        Sorted as in the column of X, i.e. the j-th cluster label corresponds 
+        to the variable stored in the j-th column of X.
+    list_neighbors : list, length (V,)
+        List including the neighbor information of each variable, as returned
+        by the get_list_neighbors() function. The j-th entry must contain a 
+        numpy array with the indices of the neighbors of variable j, j=1,...,V. 
+        Note that it is recommended to calculate list_neighbors once for an 
+        input data set and to save it to the hard drive. Whenever a parcellation 
+        generated based on the input data should be evaluated using 
+        silhouette_coefficient_spatial(), list_neighbors can be loaded from the 
+        hard drive instead of being re-calculated, which is computationally 
+        expensive.
+    metric : str, optional
+        The distance metric between two variables. One of 'euclidean' 
+        (Euclidean distance) or 'correlation' (1-abs(corr)). The default is 
+        "euclidean".
+    iter_max : int, optional
+        In order to avoid a memory error, the pairwise variable distance 
+        calculation is partitioned, if at least one of the two clusters includes 
+        more than iter_max variables. The default is 20000.
+    return_vec_sil : bool, optional
+        Should the spatial simplified silhouette width of all single variables 
+        be returned in addition to the spatial simplified silhouette 
+        coefficient? The default is False.
+
+    Returns
+    -------
+    SSC_spatial : scalar
+        The spatial simplified silhouette coefficient.
+    vec_s : ndarray, shape (V,)
+        If return_vec_sil = True, the spatial simplified silhouette coefficient 
+        of all single variables is additionally returned.
+     
+    Examples
+    --------
+    Random input data with 192 spatial variables on a 8x6x4 grid and a 
+    partition assigning each variable to one of in total four spatially
+    contiguous clusters:
+        
+    >>> X = np.random.normal(size = (50, 192))
+    >>> matXYZ = np.argwhere(np.zeros((8, 6, 4)) == 0)
+    >>> labels = np.repeat(np.array([1,2,3,4]), 2*6*4)
+    >>> list_neighbors = get_list_neighbors(matXYZ) # Best to save list_neighbors
+                                                    # to hard drive
+    >>> simplified_silhouette_coefficient_spatial(X, labels, list_neighbors, metric = "euclidean")   
+    0.01231799
+    
+    References
+    ----------
+    Vendramin L, Campello RJGB, Hruschka ER (2010) Relative clustering validity 
+        criteria: A comparative overview. Statistical analysis and data mining: 
+        the ASA data science journal 3(4):209-235
+    Tietz et al. (2021) (Publication in progress.)
+
+    """
     # Determine labels indicating different clusters
     unique_labels = np.unique(labels)
     # Determine number of observations
@@ -489,10 +633,11 @@ def simplified_silhouette_width_index_spatial(X, labels, list_neighbors, metric 
         # Update vec_s
         vec_s = np.append(vec_s, vec_s_l)
     # Return simplified silhouette index
+    SSC_spatial = np.mean(vec_s)
     if return_vec_sil:
-        return np.mean(vec_s), vec_s
+        return SSC_spatial, vec_s
     else:
-        return np.mean(vec_s)
+        return SSC_spatial
     
 def get_list_neighbors_cluster(labels, list_neighbors):
     """
