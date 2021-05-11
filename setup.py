@@ -18,7 +18,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name='SPARTACUS',
-    version='0.1.0',
+    version='0.1.1',
     license='MIT',
     description='A package to perform spatial hierarchical agglomerative clustering as well as spatially constrained ensemble clustering. Further includes implementations of the silhouette coefficient, the simplified silhouette coefficient and spatial adaptations thereof.',
     long_description=README,
@@ -64,7 +64,7 @@ setup(
     ],
     python_requires='>=3.6',
     install_requires=[# TODO versioning
-        "warnings", "numpy", "scipy", "scikit-learn"
+        "numpy", "scipy", "scikit-learn"
         # eg: 'aspectlib==1.1.1', 'six>=1.7',
     ],
     extras_require={# Put here requires needed for testing

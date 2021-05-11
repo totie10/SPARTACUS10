@@ -55,29 +55,29 @@ class TestSum(unittest.TestCase):
         labels = sp.get_cluster(Z, V = 8, n_init_cluster = 2)
         self.assertEqual(labels, np.array([1, 1, 1, 1, 2, 2, 2, 2]))
         
-    def test_SHAC_comparison_with_Python_function(self):
-        """
-        Camparsion with linkage function under no spatial constraint.
-        """
-    Z_allNeighbors = shac(X, matXYZ_allNeighbors, method='centroid', metric='euclidean',
-                          diag_neighbor = False, standardize = False)
+    # def test_SHAC_comparison_with_Python_function(self):
+    #     """
+    #     Camparsion with linkage function under no spatial constraint.
+    #     """
+    # Z_allNeighbors = shac(X, matXYZ_allNeighbors, method='centroid', metric='euclidean',
+    #                       diag_neighbor = False, standardize = False)
     
-    Z_python = hierarchy.linkage(X.T, method = "centroid", metric = "euclidean")
+    # Z_python = hierarchy.linkage(X.T, method = "centroid", metric = "euclidean")
     
-    Z_allNeighbors - Z_python
+    # Z_allNeighbors - Z_python
         
-    def test_SHAC_comparison_with_Python_function_Ward(self):
-        """
-        Camparsion with AgglomerativeClustering package Ward.
-        """
+    # def test_SHAC_comparison_with_Python_function_Ward(self):
+    #     """
+    #     Camparsion with AgglomerativeClustering package Ward.
+    #     """
         
-    def test_SPARTACUS_comparison_with_R_function(self):
-        """
-        Camparsion with R function of clustering around latent components
-        under no spatial constraint.
-        """
+    # def test_SPARTACUS_comparison_with_R_function(self):
+    #     """
+    #     Camparsion with R function of clustering around latent components
+    #     under no spatial constraint.
+    #     """
         
-    def test_spatial_contiguity(self):
+    # def test_spatial_contiguity(self):
         
         
 # def test_main():
