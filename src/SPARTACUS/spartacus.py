@@ -75,7 +75,8 @@ def shac(X, matXYZ, method='ward', metric='spartacus', diag_neighbor = False,
     --------
     Random input data with V = 24 spatial variables on a 4x3x2 grid and ten 
     subjects:
-     
+    
+    >>> import numpy as np    
     >>> V = 24
     >>> X = np.random.normal(size = (10, V))
     >>> matXYZ = np.argwhere(np.zeros((4,3,2)) == 0)
@@ -674,6 +675,7 @@ def spatial_ensemble_clustering(X, matXYZ, method='hellinger', metric='jaccard',
     Input cluster ensemble with V = 8 spatial variables and on a 2x2x2 grid and 
     six subjects:
         
+    >>> import numpy as np    
     >>> X = np.array([[1,1,2,2,3,3,4,4],
                       [1,1,2,2,3,3,4,4],
                       [1,1,2,2,3,3,4,4],
