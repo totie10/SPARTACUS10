@@ -1,7 +1,6 @@
 
 # from SPARTACUS.cli import main
 import pytest
-import csv
 
 import numpy as np
 
@@ -124,18 +123,18 @@ def test_SPARTACUS_comparison_with_R_function():
     Camparsion with R function of clustering around latent components
     under no spatial constraint.
     """
-    matrixA = np.genfromtxt('matrixA.csv', delimiter=",", skip_header=1, usecols = range(1,21))
+    matrixA = np.genfromtxt('tests/matrixA.csv', delimiter=",", skip_header=1, usecols = range(1,21))
     matXYZ_A = np.zeros((matrixA.shape[1], 3))+1
     Z = sp.shac(matrixA, matXYZ_A, metric = 'spartacus', standardize = True)
     labelsA = sp.get_cluster(Z, matrixA.shape[1], n_init_cluster = 4)
-    R_labelsA = np.genfromtxt('R_labels_matrixA.csv', delimiter=",", skip_header=1).astype(int)[0,:]
+    R_labelsA = np.genfromtxt('tests/R_labels_matrixA.csv', delimiter=",", skip_header=1).astype(int)[0,:]
     assert identical_labels(labelsA, R_labelsA), "Comparison with R function matrixA failed"
     
-    matrixB = np.genfromtxt('matrixB.csv', delimiter=",", skip_header=1, usecols = range(1,101))   
+    matrixB = np.genfromtxt('tests/matrixB.csv', delimiter=",", skip_header=1, usecols = range(1,101))   
     matXYZ_B = np.zeros((matrixB.shape[1], 3))
     Z = sp.shac(matrixB, matXYZ_B, metric = 'spartacus', standardize = True)
     labelsB = sp.get_cluster(Z, matrixB.shape[1], n_init_cluster = 8)
-    R_labelsB = np.genfromtxt('R_labels_matrixB.csv', delimiter=",", skip_header=1).astype(int)[0,:]
+    R_labelsB = np.genfromtxt('tests/R_labels_matrixB.csv', delimiter=",", skip_header=1).astype(int)[0,:]
     assert identical_labels(labelsB, R_labelsB), "Comparison with R function matrixB failed"
     
     

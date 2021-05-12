@@ -18,7 +18,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name='SPARTACUS',
-    version='0.1.1',
+    version='0.1.2',
     license='MIT',
     description='A package to perform spatial hierarchical agglomerative clustering as well as spatially constrained ensemble clustering. Further includes implementations of the silhouette coefficient, the simplified silhouette coefficient and spatial adaptations thereof.',
     long_description=README,
@@ -26,7 +26,8 @@ setup(
     author='Tobias Tietz',
     author_email='tobias.tietz10@gmail.com',
     url='https://github.com/totie10/SPARTACUS',
-    packages=find_packages('src', exclude=("tests",)),
+    #packages=find_packages('src', exclude=("tests",)),
+    packages=find_packages('src'),
     package_dir={'': 'src'},
     py_modules=[splitext(basename(path))[0] for path in glob('src/*.py')],
     include_package_data=True,
@@ -68,6 +69,7 @@ setup(
         # eg: 'aspectlib==1.1.1', 'six>=1.7',
     ],
     extras_require={# Put here requires needed for testing
+                    'dev': ['pytest']
         # eg:
         #   'rst': ['docutils>=0.11'],
         #   ':python_version=="2.6"': ['argparse'],
