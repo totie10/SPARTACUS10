@@ -1,5 +1,4 @@
 graft src
-graft tests
 
 include .bumpversion.cfg
 
@@ -7,5 +6,7 @@ include AUTHORS.rst
 include CHANGELOG.rst
 include LICENSE
 include README.md
+
+include tox.ini
 
 global-exclude *.py[cod] __pycache__/* *.so *.dylib
