@@ -1,8 +1,23 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Feb 21 11:49:19 2019
+This module includes implementations of the popular silhouette coefficient 
+(silhouette_coefficient()) for large data sets (avoiding to run into a memory 
+error) as introduced by Rousseeuw (1987), the computationally cheaper 
+simplified silhouette coefficient (simplified_silhouette_coefficient()) as 
+introduced by Vendramin et al. (2010), as well as spatial adaptations thereof
+(silhouette_coefficient_spatial(), or simplified_silhouette_coefficient_spatial(), 
+respectively), which are developed to evaluate partitions of images with 
+spatially contiguous clusters (see Tietz et al., 2021).
 
-@author: admin
+References
+----------
+Rousseeuw PJ (1987) Silhouettes: a graphical aid to the interpretation and 
+        validation of cluster analysis. Journal of computational and applied 
+        mathematics 20:53-65
+Vendramin L, Campello RJGB, Hruschka ER (2010) Relative clustering validity 
+        criteria: A comparative overview. Statistical analysis and data mining: 
+        the ASA data science journal 3(4):209-235
+Tietz et al. (2021) (Publication in progress)
 """
 
 import numpy as np
@@ -666,91 +681,3 @@ def get_list_neighbors_cluster(labels, list_neighbors):
     # Return list
     return list_neighbors_cluster
     
-###############################################################################
-if __name__ == "__main__" and __name__ != "__main__":
-    import sys
-    sys.path.append("C:/Users/admin/Documents/Promotion_Teil_2_MRI/MRI_2019/Funktionen")
-    import Plot_ensemble_brain_image as bi
-    import spatial_hierarchical_variable_clusteringV2 as vc
-    import sklearn.metrics as metrics
-    import scipy.io
-    import os
-    import csv
-    from sklearn.preprocessing import StandardScaler
-    # Test Silhouette function
-    # 1. arrayA
-    os.chdir("C:/Users/admin/Documents/Promotion_Teil_2_MRI/Python/Python_Code/Python_Code")
-    
-    with open("matrixA.csv") as csvfile:
-        readCSV = csv.reader(csvfile, delimiter=',')
-        matA = []
-        for row in readCSV:
-            matA.append(row)
-    arrayA = np.array(matA)
-    arrayA = arrayA[1:arrayA.shape[0],:]
-    arrayA = arrayA[:,1:arrayA.shape[1]]
-    arrayA = arrayA.astype(int)
-    X = arrayA.copy()
-    
-    matXYZ = np.ones((arrayA.shape[1], 3), dtype = int)
-    
-    Z = vc.hclustvar_spatial(arrayA, matXYZ, method = 'ward', metric = 'euclidean', 
-                          standardize = False)
-    labels = vc.get_cluster(Z, X.shape[1], 5)    
-        
-    silhouette_width_index(X, labels, metric = "correlation", iter_max = 10)    
-        
-    metrics.silhouette_score(X.T, labels, metric = "correlation")    
-        
-        
-        
-    ###############################################################################
-    # 2. Further flexible tests 
-    n_voxel = 400
-    N = 100
-    labels =  np.random.randint(1,11,n_voxel)   
-    
-    X = np.random.normal(size = (N, n_voxel))
-        
-    silhouette_width_index(X, labels, metric = "correlation")    
-        
-    metrics.silhouette_score(X.T, labels, metric = "correlation")  
-    
-    
-    ###############################################################################  
-    # 3. Test on real data
-    # Read in data set
-    standardize = True
-    mat = scipy.io.loadmat('C:/Users/admin/Documents/Promotion_Teil_2_MRI/MRI_2019/Daten/FZJ1000_smoothdat.mat')    
-    matFZJ693 = mat["GLMFlags"].item(0)[2]
-    matFZJ693 = np.delete(matFZJ693, np.array([126961, 126962, 126992, 126993, 18602], dtype = int), 1)
-    matFZJ693 = np.delete(matFZJ693, np.array([323,324], dtype = int), 0)
-    # Standardize data
-    if standardize:
-        matFZJ693 = StandardScaler().fit_transform(matFZJ693)
-        matFZJ693 = matFZJ693 / np.sqrt(matFZJ693.shape[0] / (matFZJ693.shape[0] - 1))
-    
-    X = matFZJ693[:200,:]
-    dir_from = "C:/Users/admin/Documents/Promotion_Teil_2_MRI/MRI_2019"
-    os.chdir(dir_from)
-    # Get labels
-    n_cluster = 83
-    vec_cluster = bi.determine_clustering(n_cluster, ensemble_method = "subsample",
-                                           cluster_algo = "lacomp_", sampling = "subsampling")
-    silhouette_width_index(X, vec_cluster, iter_max = 30000)
-
-    ###########################################################################
-    # 4. Test ensemble silhouette coefficient
-    X = np.array([[1,1,2,2,3,3,4,4],
-                      [1,1,2,2,3,3,4,4],
-                      [1,1,2,2,3,3,4,4],
-                      [1,1,2,2,5,5,6,6],
-                      [1,1,1,2,3,3,3,4],
-                      [1,1,1,2,3,3,3,4]])   
-    labels = [1,1,2,2,3,3,4,4]
-    silhouette_width_index(X[0:4,:], labels, metric = "jaccard", iter_max = 20000)
-    
-    X1 = np.array([[1,1,2,2], [1,2,2,2], [1,1,1,2]])
-    labels1 = [1,1,2,2]
-    silhouette_width_index(X1, labels1, metric = "jaccard", iter_max = 20000)
-    # Checked by hand. Same results :-) 2*(0.6+1/3)/4

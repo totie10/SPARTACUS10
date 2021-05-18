@@ -1,8 +1,31 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Dec 10 18:43:29 2018
+This module includes implementations of popular spatially constrained 
+hierarchical agglomerative clustering (SHAC) methods as described by Carvalho et al. (2009). 
+These functions require imaging data as input, where the voxels are organized 
+on a regular grid structure. The idea is to start with each voxel in a separate 
+cluster and to merge in each step of the algorithms those two neighboring 
+clusters, which have the closest distance according to the agglomeration method. 
 
-@author: Tobias Tietz
+A SHAC method that is especially designed to cluster variables is the SPARTACUS 
+(SPAtial hieRarchical agglomeraTive vAriable ClUStering) method (Tietz et al, 2021).
+The SPARTACUS distance between two clusters is the overall loss in explained 
+total variance by all clusters first principal components that would be caused, 
+if these two clusters are merged (also see Vigneau and Qannari (2003)). The 
+SPARTACUS method is also implemented in this module.
+
+Finally, this module includes an implementation of spatial hierarchical ensemble 
+clustering (SEC) including the Hellinger method as introduced by Tietz et al. (2021).
+
+
+References
+----------
+Carvalho AXY, Albuquerque PHM, de Almeida Junior GZ, Guimaraes RD (2009)
+        Spatial hierarchical clustering. Revista Brasileira de Biometria 
+        27(3):411-442
+Vigneau E, Qannari EM (2003) Clustering of variables around latent components.
+        Communications in Statistics-Simulation and Computation 32(4):1131-1150
+Tietz et al. (2021) (Publication in progress.)
 """
 
 import warnings
@@ -1022,103 +1045,3 @@ def get_new_dist_ensemble(X, X_cluster, i, z, method, metric, iter_max = 4):
         return np.max(dst)
     else:
         return 1/size_i*1/size_z*np.sum(dst)
-
-
-###############################################################################
-if __name__ == "__main__" and __name__ != "__main__":
-    # Load packages
-    # import sys
-    # sys.path.append("C:/Users/admin/Documents/Promotion_Teil_2_MRI/MRI_2019/Funktionen")
-    # import Simulate_spatial_image_data as sid
-    from matplotlib import pyplot as plt
-    import sklearn.metrics as metrics
-    
-    ###########################################################################
-    #### Test
-    """
-    Compare with function hierarchy.linkage in python and check if spatial 
-    constraint works.
-    Check for average, complete, single and centroid linkage
-    """
-        
-    X = np.random.normal(size=48).reshape((6,8))
-    matXYZ = np.array([[1,1,1],
-                       [1,2,1],
-                       [1,3,1],
-                       [1,4,1],
-                       [2,1,1],
-                       [2,2,1],
-                       [2,3,1],
-                       [2,4,1]])    
-    
-    # Is spatial constraint fullfilled???
-    Z = shac(X, matXYZ, method='average', metric='euclidean',
-                          diag_neighbor = False, standardize = False)
-    
-    plt.figure(figsize=(10, 5))
-    plt.title('Spatial Hierarchical Clustering Dendrogram')
-    plt.xlabel('sample index')
-    plt.ylabel('distance')
-    hierarchy.dendrogram(
-        Z,
-        leaf_rotation=90.,  # rotates the x axis labels
-        leaf_font_size=8.,  # font size for the x axis labels
-    )
-    # Check
-    
-    # Under the assumption that all voxels are neighbors to each other, do we 
-    # get the same results as in hierarchy.linkage???
-    matXYZ_allNeighbors = np.zeros((8,3)) + 1
-    Z_allNeighbors = shac(X, matXYZ_allNeighbors, method='centroid', metric='euclidean',
-                          diag_neighbor = False, standardize = False)
-    
-    Z_python = hierarchy.linkage(X.T, method = "centroid", metric = "euclidean")
-    
-    Z_allNeighbors - Z_python
-    # Check 
-    
-    ###########################################################################
-    #### Test 2
-    """
-    Compare with function hierarchy.linkage in python and check for spatial
-    constraint.
-    """
-
-    # Generate data, i.e. X and matXYZ
-    # Dimensions of images
-    vec_dim = (10,10,1)
-    # Number of different regions to simulate
-    n_regions = 4
-    # Number of sample images
-    N = 100
-    # Generate regions and matXYZ
-    vec_cluster, matXYZ = sid.get_regions(vec_dim, n_regions, diag_neighbor = False, rand = None).values()
-    # Number of voxels per image
-    V = vec_cluster.shape[0]
-    # Determine parameters that determine voxel intensities
-    vec_mean = np.repeat(0.5, n_regions)
-    vec_cor = np.repeat(0.7, n_regions)
-    basis_cor = 0.4
-    # Determine intensity matrix X
-    X, Sigma = sid.get_intensities_normal_correlated(vec_cluster, N = N, vec_mean = vec_mean, 
-                                      vec_cor = vec_cor, basis_cor = basis_cor, 
-                                      rand = None)
-    
-    # Under the assumption that all voxels are neighbors to each other, do we 
-    # get the same results as in hierarchy.linkage???
-    matXYZ_allNeighbors = np.zeros((np.prod(vec_dim), 3)) + 1
-    Z_allNeighbors = shac(X, matXYZ_allNeighbors, method='single', metric='euclidean',
-                          diag_neighbor = False, standardize = False)
-    
-    Z_python = hierarchy.linkage(X.T, method = "single", metric = "euclidean")
-    
-    np.sum(np.abs(Z_allNeighbors[:,(0,1)] - Z_python[:,(0,1)]))
-    # Check 
-    
-    # Does it work well with spatial constraint???
-    Z = shac(X, matXYZ, method='average', metric='squared_correlation',
-                          diag_neighbor = False, standardize = False)
-    pred_cluster = get_cluster(Z, V, n_init_cluster = 4)
-    metrics.adjusted_rand_score(vec_cluster, pred_cluster)
-
-
