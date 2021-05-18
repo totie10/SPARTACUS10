@@ -1,4 +1,6 @@
-# SPARTACUS
+*********
+SPARTACUS
+*********
 Includes functions to perform spatial hierarchical agglomerative clustering (SHAC),
 including SPARTACUS (SPAtial hieRarchical agglomeraTive vAriable ClUStering), 
 as well as spatially constrained ensemble clustering (SEC). These functions are 
@@ -6,9 +8,12 @@ especially designed to cluster neuroimaging data. Moreover, implementations of
 the silhouette coefficient (SC) for large data, the simplified silhouette 
 coefficient (SSC) and spatial adaptations thereof are included as well. 
 
-## Description of the methods
 
-### SHAC and SEC methods 
+Description of the methods
+==========================
+
+SHAC and SEC methods 
+--------------------
 
 In neuroimaging, a goal is to subdivide the human brain into spatially contiguous 
 parcels based on, e.g., structural or functional brain images.
@@ -47,13 +52,15 @@ based on a cluster ensemble.
 The SHAC and SEC methods are implemented in the spartacus module from the SPARTACUS
 package.
 
-### Silhouette coefficient and its adaptations
+
+Silhouette coefficient and its adaptations
+--------------------
 
 In order to evaluate the quality of the final parcellations, internal validation
 measures can be employed, one of which is the well established silhouette 
 coefficient (SC) (Rousseeuw, 1987). 
 
-Let $\mathbf{C}_K=(C_1,\ldots,C_K)$ be a parcellation which should be evaluated 
+Let :math:`\mathbf{C}_K=(C_1,\ldots,C_K)` be a parcellation which should be evaluated 
 on a data set $\mathbf{X}\in \mathbb{R}^{N\times V}$, where $N$ is the number of 
 subjects and $V$ is the number of image voxels. The silhouette width of a single 
 voxel $\mathbf{x}_j, j=1,\ldots,V$ belonging to cluster $C_k, k=1,\ldots,K$ 
@@ -105,30 +112,33 @@ the $b_i$ value of voxel $\mathbf{x}_i$ belonging to cluster $C_k$ only with
 respect to the neighboring clusters of $C_k$. 
 
 
-## Installation
+Installation
+============
 
-You can install the SPARTACUS package from [PyPI](https://pypi.org/project/SPARTACUS/):
+You can install the SPARTACUS package from [PyPI](https://pypi.org/project/SPARTACUS/)::
 
     pip install SPARTACUS
 
 SPARTACUS is supported on Python 3.6 and above.
 
-## How to use
+
+How to use
+==========
 
 You can call the SHAC and SEC functions in your own Python code, by importing 
-from the `SPARTACUS` package:
+from the `SPARTACUS` package::
 
-    >>> from SPARTACUS import spartacus
+    from SPARTACUS import spartacus
 
 Example to perform SPARTACUS method, i.e. random input data with V = 24 spatial 
-variables on a 4x3x2 grid and ten subjects:
+variables on a 4x3x2 grid and ten subjects::
     
     >>> import numpy as np
     >>> V = 24
     >>> X = np.random.normal(size = (10, V))
     >>> matXYZ = np.argwhere(np.zeros((4,3,2)) == 0)
     
-SPARTACUS based partition with four clusters:
+SPARTACUS based partition with four clusters::
         
     >>> Z = spartacus.shac(X, matXYZ, metric = 'spartacus', standardize = False)
     >>> labels = spartacus.get_cluster(Z, V, n_init_cluster = 4)
@@ -137,7 +147,7 @@ SPARTACUS based partition with four clusters:
            4, 3])
            
 Example to perform average linkage based SEC method, i.e. random cluster ensemble 
-with V = 8 spatial variables on a 2x2x2 grid and six base partitions:           
+with V = 8 spatial variables on a 2x2x2 grid and six base partitions::           
     
     >>> import numpy as np    
     >>> X = np.array([[1,1,2,2,3,3,4,4],
@@ -148,7 +158,7 @@ with V = 8 spatial variables on a 2x2x2 grid and six base partitions:
                       [1,1,1,2,3,3,3,4]])
     >>> matXYZ = np.argwhere(np.zeros((2,2,2)) == 0)
     
-Average linkage based partition with two clusters:
+Average linkage based partition with two clusters::
         
     >>> Z = spartacus.spatial_ensemble_clustering(X, matXYZ, method='average')
     >>> labels = spartacus.get_cluster(Z, V = 8, n_init_cluster = 2)
@@ -157,13 +167,13 @@ Average linkage based partition with two clusters:
     
 
 You can call the SC, SSC and spatial adaptations thereof in your own Python code, 
-by importing from the `SPARTACUS` package:
+by importing from the `SPARTACUS` package::
 
     >>> from SPARTACUS import spatial_silhouette
 
 Example evaluation using the silhouette coefficient of randomly generated input 
 data with 100 variables and a random partition assigning each variable to one 
-of in total four clusters:
+of in total four clusters::
     
     >>> import numpy as np
     >>> X = np.random.normal(size = (50, 100))
@@ -171,15 +181,18 @@ of in total four clusters:
     >>> spatial_silhouette.silhouette_coefficient(X, labels, metric = "euclidean")   
     -0.0171145
     
-## Development
+  
+Development
+===========
 
-To run all the tests run
+To run all the tests run::
 
     py.test 
 
 from the SPARTACUS directory (installed in side_packages). 
     
-## References
+References
+==========
 
 Carvalho AXY, Albuquerque PHM, de Almeida Junior GZ, Guimaraes RD (2009)
         Spatial hierarchical clustering. Revista Brasileira de Biometria 

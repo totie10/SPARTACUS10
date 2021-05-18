@@ -18,6 +18,7 @@ Vendramin L, Campello RJGB, Hruschka ER (2010) Relative clustering validity
         criteria: A comparative overview. Statistical analysis and data mining: 
         the ASA data science journal 3(4):209-235
 Tietz et al. (2021) (Publication in progress)
+
 """
 
 import numpy as np

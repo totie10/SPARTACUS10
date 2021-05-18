@@ -26,6 +26,7 @@ Carvalho AXY, Albuquerque PHM, de Almeida Junior GZ, Guimaraes RD (2009)
 Vigneau E, Qannari EM (2003) Clustering of variables around latent components.
         Communications in Statistics-Simulation and Computation 32(4):1131-1150
 Tietz et al. (2021) (Publication in progress.)
+
 """
 
 import warnings
