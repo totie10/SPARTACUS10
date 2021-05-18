@@ -1,6 +1,4 @@
-*********
-SPARTACUS
-*********
+# SPARTACUS
 Includes functions to perform spatial hierarchical agglomerative clustering (SHAC),
 including SPARTACUS (SPAtial hieRarchical agglomeraTive vAriable ClUStering), 
 as well as spatially constrained ensemble clustering (SEC). These functions are 
@@ -8,12 +6,9 @@ especially designed to cluster neuroimaging data. Moreover, implementations of
 the silhouette coefficient (SC) for large data, the simplified silhouette 
 coefficient (SSC) and spatial adaptations thereof are included as well. 
 
+## Description of the methods
 
-Description of the methods
-==========================
-
-SHAC and SEC methods 
---------------------
+### SHAC and SEC methods 
 
 In neuroimaging, a goal is to subdivide the human brain into spatially contiguous 
 parcels based on, e.g., structural or functional brain images.
@@ -52,35 +47,20 @@ based on a cluster ensemble.
 The SHAC and SEC methods are implemented in the spartacus module from the SPARTACUS
 package.
 
-
-Silhouette coefficient and its adaptations
---------------------
+### Silhouette coefficient and its adaptations
 
 In order to evaluate the quality of the final parcellations, internal validation
 measures can be employed, one of which is the well established silhouette 
-coefficient (SC) (Rousseeuw, 1987). 
-
-Let :math:`\\mathbf{C}_K=(C_1,\\ldots,C_K)` be a parcellation which should be evaluated 
-on a data set $\mathbf{X}\in \mathbb{R}^{N\times V}$, where $N$ is the number of 
-subjects and $V$ is the number of image voxels. The silhouette width of a single 
-voxel $\mathbf{x}_j, j=1,\ldots,V$ belonging to cluster $C_k, k=1,\ldots,K$ 
-is given by
-..math::
-s_i = \\dfrac{b__i-a_i}{\max\{a_i,b_i\}},
-
-where
-$$a_i = \dfrac{1}{|C_k|-1}\sum\limits_{\substack{\mathbf{x}_\ell \in C_k \\ \ell\neq i}}d\big(\mathbf{x}_i, \mathbf{x}_\ell\big)$$
-is the average distance of $\mathbf{x}_i$ to all other voxels in $C_k$ and 
-$$b_i = \min_{m \neq k}\dfrac{1}{|C_m|}\sum_{\mathbf{x}_\ell \in C_m}d\big(\mathbf{x}_i, \mathbf{x}_\ell\big)$$
-is the average distance of $\mathbf{x}_i$ to all voxels in the closest cluster.  
-As distance $d$, e.g., the Euclidean distance or the correlation based distance
-$$d_\text{corr}(\mathbf{x}_j,\mathbf{x}_\ell)=1-|\text{corr}(\mathbf{x}_j,\mathbf{x}_\ell)|$$ 
-can be employed. 
-The silhouette coefficient of $\mathbf{C}_K$ is then given as
-$$\text{SC} = \dfrac{1}{N}\sum_{i=1}^Ns_i.$$
+coefficient (SC) (Rousseeuw, 1987). The silhouette coefficient of a voxel is 
+calculated as ``(b - a) / max(a, b)``, where ``a`` is the mean distance of that 
+voxel to all other voxels from its cluster and ``b`` is the smallest mean distance 
+of that voxel to all voxels from another cluster. As distance, e.g., the Euclidean
+distance or the correlation distance (1 - abs(corr)) is used. The silhouette 
+coefficient of a parcellation is then the mean over all these voxel-wise 
+silhouette coefficients.
 
 An issue with the silhouette coefficient is that its memory consuming, if the 
-number of voxels $V$ is large, as it is typically the case with high-resolution 
+number of voxels is large, as it is typically the case with high-resolution 
 neuroimages. In order to avoid running into a memory error, the module 
 spatial_silhouette from the SPARTACUS package includes an implementation 
 of the silhouette coefficient for large data sets that avoids to run into a memory 
@@ -88,18 +68,14 @@ error, by calculating the pairwise distances between voxels not all at once, but
 in chunks. 
 
 Another issue of the silhouette coefficient is that it is computationally expensive,
-if $V$ is large. Therefore, the computationally less expensive simplified silhouette 
-coefficient (SSC) as introduced by Vendramin et al. (2010) is implemented in 
-spatial_silhouette module as well.
-In this variation, $a_i$ is the distance of voxel $\mathbf{x}_i$ to the 
-centroid $\mathbf{c}_k \in \mathbb{R}^V$ of its cluster $C_k$, i.e.
-$$a_i = d(\mathbf{x}_i, \mathbf{c}_k)$$
-and $b_i$ is the minimum of the distances of $\mathbf{x}_i$ to the centroids 
-of the other clusters, i.e.
-$$b_i = \min_{m\neq k}d(\mathbf{x}_i,  \mathbf{c}_m).$$  
-The distance measure $d$ is either the Euclidean distance or the correlation
-distance $d_\text{corr}$ and the centroid is either the mean over all data points 
-in $C_k$ or the first principal component of that cluster, respectively.   
+if the number of voxels is large. Therefore, the computationally less expensive 
+simplified silhouette coefficient (SSC) as introduced by Vendramin et al. (2010) 
+is implemented in spatial_silhouette module as well.
+In this variation, ``a`` is the distance of the respective voxel to the centroid
+of its cluster and ``b`` is the smallest distance of that voxel to the centroid 
+of another cluster. The distance measure is either the Euclidean distance or the correlation
+distance and the centroid of a cluster is either the mean over all data points 
+from that cluster or the first principal component of that cluster, respectively.   
 
 Both, the silhouette coefficient and its simplified variant ignore the spatial 
 information provided by the input data. However, cross-hemispheric communications,
@@ -110,37 +86,34 @@ not be merged by a spatial clustering algorithm and, therefore, reduce the
 SC or SSC score. Therefore, spatial adaptations of the SC and SSC as proposed 
 by Tietz et al. (2021) are implemented in the spatial_silhouette module that are 
 independent of cross-hemispheric communications. The idea is to calculate 
-the $b_i$ value of voxel $\mathbf{x}_i$ belonging to cluster $C_k$ only with 
-respect to the neighboring clusters of $C_k$. 
+the ``b`` value of each voxel only with respect to the neighboring clusters of 
+the cluster this voxel belongs to. 
 
 
-Installation
-============
+## Installation
 
-You can install the SPARTACUS package from [PyPI](https://pypi.org/project/SPARTACUS/)::
+You can install the SPARTACUS package from [PyPI](https://pypi.org/project/SPARTACUS/):
 
     pip install SPARTACUS
 
 SPARTACUS is supported on Python 3.6 and above.
 
-
-How to use
-==========
+## How to use
 
 You can call the SHAC and SEC functions in your own Python code, by importing 
-from the `SPARTACUS` package::
+from the `SPARTACUS` package:
 
-    from SPARTACUS import spartacus
+    >>> from SPARTACUS import spartacus
 
 Example to perform SPARTACUS method, i.e. random input data with V = 24 spatial 
-variables on a 4x3x2 grid and ten subjects::
+variables on a 4x3x2 grid and ten subjects:
     
     >>> import numpy as np
     >>> V = 24
     >>> X = np.random.normal(size = (10, V))
     >>> matXYZ = np.argwhere(np.zeros((4,3,2)) == 0)
     
-SPARTACUS based partition with four clusters::
+SPARTACUS based partition with four clusters:
         
     >>> Z = spartacus.shac(X, matXYZ, metric = 'spartacus', standardize = False)
     >>> labels = spartacus.get_cluster(Z, V, n_init_cluster = 4)
@@ -149,7 +122,7 @@ SPARTACUS based partition with four clusters::
            4, 3])
            
 Example to perform average linkage based SEC method, i.e. random cluster ensemble 
-with V = 8 spatial variables on a 2x2x2 grid and six base partitions::           
+with V = 8 spatial variables on a 2x2x2 grid and six base partitions:           
     
     >>> import numpy as np    
     >>> X = np.array([[1,1,2,2,3,3,4,4],
@@ -160,7 +133,7 @@ with V = 8 spatial variables on a 2x2x2 grid and six base partitions::
                       [1,1,1,2,3,3,3,4]])
     >>> matXYZ = np.argwhere(np.zeros((2,2,2)) == 0)
     
-Average linkage based partition with two clusters::
+Average linkage based partition with two clusters:
         
     >>> Z = spartacus.spatial_ensemble_clustering(X, matXYZ, method='average')
     >>> labels = spartacus.get_cluster(Z, V = 8, n_init_cluster = 2)
@@ -169,13 +142,13 @@ Average linkage based partition with two clusters::
     
 
 You can call the SC, SSC and spatial adaptations thereof in your own Python code, 
-by importing from the `SPARTACUS` package::
+by importing from the `SPARTACUS` package:
 
     >>> from SPARTACUS import spatial_silhouette
 
 Example evaluation using the silhouette coefficient of randomly generated input 
 data with 100 variables and a random partition assigning each variable to one 
-of in total four clusters::
+of in total four clusters:
     
     >>> import numpy as np
     >>> X = np.random.normal(size = (50, 100))
@@ -183,18 +156,15 @@ of in total four clusters::
     >>> spatial_silhouette.silhouette_coefficient(X, labels, metric = "euclidean")   
     -0.0171145
     
-  
-Development
-===========
+## Development
 
-To run all the tests run::
+To run all the tests run
 
     py.test 
 
 from the SPARTACUS directory (installed in side_packages). 
     
-References
-==========
+## References
 
 Carvalho AXY, Albuquerque PHM, de Almeida Junior GZ, Guimaraes RD (2009)
         Spatial hierarchical clustering. Revista Brasileira de Biometria 
