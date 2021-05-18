@@ -60,12 +60,14 @@ In order to evaluate the quality of the final parcellations, internal validation
 measures can be employed, one of which is the well established silhouette 
 coefficient (SC) (Rousseeuw, 1987). 
 
-Let :math:`\mathbf{C}_K=(C_1,\ldots,C_K)` be a parcellation which should be evaluated 
+Let :math:`\\mathbf{C}_K=(C_1,\\ldots,C_K)` be a parcellation which should be evaluated 
 on a data set $\mathbf{X}\in \mathbb{R}^{N\times V}$, where $N$ is the number of 
 subjects and $V$ is the number of image voxels. The silhouette width of a single 
 voxel $\mathbf{x}_j, j=1,\ldots,V$ belonging to cluster $C_k, k=1,\ldots,K$ 
 is given by
-$$s_i = \dfrac{b_i-a_i}{\max\{a_i,b_i\}},$$
+..math::
+s_i = \\dfrac{b__i-a_i}{\max\{a_i,b_i\}},
+
 where
 $$a_i = \dfrac{1}{|C_k|-1}\sum\limits_{\substack{\mathbf{x}_\ell \in C_k \\ \ell\neq i}}d\big(\mathbf{x}_i, \mathbf{x}_\ell\big)$$
 is the average distance of $\mathbf{x}_i$ to all other voxels in $C_k$ and 
