@@ -417,6 +417,7 @@ def silhouette_coefficient_spatial(X, labels, list_neighbors, metric = "euclidea
     Tietz et al. (2021) (Publication in progress.)
 
     """
+    
     # Determine labels indicating different clusters
     unique_labels = np.unique(labels)
     # Initiate vec_s
