@@ -15,6 +15,7 @@ from SPARTACUS import spatial_silhouette as spasi
 
 import sklearn.metrics as metrics
 
+import os
 
         
 def test_SHAC_comparison_with_Python_function():
@@ -74,16 +75,24 @@ def test_SHAC_comparison_with_Python_function_Ward():
     assert identical_labels(labels_shac, ward.labels_), "SHAC Ward not identical to AgglomerativeClustering"
 
 
+def find_path(name, path = None):
+    if path is None:
+        path = os.getcwd()
+    for root, dirs, files in os.walk(path):
+        if name in files:
+            return os.path.join(root, name)
+        
+
 def test_SPARTACUS_comparison_with_R_function():
     """
     Camparsion with R function of clustering around latent components
     under no spatial constraint.
     """
-    matrixA = np.genfromtxt('src/SPARTACUS/tests/matrixA.csv', delimiter=",", skip_header=1, usecols = range(1,21))
+    matrixA = np.genfromtxt(find_path("matrixA.csv"), delimiter=",", skip_header=1, usecols = range(1,21))
     matXYZ_A = np.zeros((matrixA.shape[1], 3))+1
     Z = sp.shac(matrixA, matXYZ_A, metric = 'spartacus', standardize = True)
     labelsA = sp.get_cluster(Z, matrixA.shape[1], n_init_cluster = 4)
-    R_labelsA = np.genfromtxt('src/SPARTACUS/tests/R_labels_matrixA.csv', delimiter=",", skip_header=1).astype(int)[0,:]
+    R_labelsA = np.genfromtxt(find_path("R_labels_matrixA.csv"), delimiter=",", skip_header=1).astype(int)[0,:]
     assert identical_labels(labelsA, R_labelsA), "Comparison with R function matrixA failed"
     
 
@@ -183,7 +192,7 @@ def tests_for_silhouette():
     silhouette_score() function from sklearn.metrics using Euclidean metric?
     """
     # Test on matrixA
-    X = np.genfromtxt('src/SPARTACUS/tests/matrixA.csv', delimiter=",", skip_header=1, usecols = range(1,21))
+    X = np.genfromtxt(find_path("matrixA.csv"), delimiter=",", skip_header=1, usecols = range(1,21))
     V = X.shape[1]
     for i in range(3, 11):
         labels = np.random.randint(1, i+1, V)

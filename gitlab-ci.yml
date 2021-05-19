@@ -1,0 +1,7 @@
+image: python:latest
+
+test:
+  stage: test
+  script: 
+  - pip install pytest
+  - python -m pytest -v

@@ -23,7 +23,7 @@ The main idea is to, in the beginning, consider each image voxel as its own clus
 and to merge in each step of the algorithm the clostest two clusters under the
 constraint that these clusters must be spatial neighbors. Hereby, two clusters are 
 spatial neighbors, if at least one voxel from one cluster is a spatial neighbor 
-of a voxel from the other cluster. The alorithm proceeds until either all voxels are 
+of a voxel from the other cluster. The algorithm proceeds until either all voxels are 
 in the same cluster or until all clusters are discontiguous. The latter occurs,
 if the input data consists of multiple discontiguous regions. In order to calculate
 the distance between clusters, popular linkage functions such as single, complete 
@@ -55,7 +55,7 @@ coefficient (SC) (Rousseeuw, 1987). The silhouette coefficient of a voxel is
 calculated as ``(b - a) / max(a, b)``, where ``a`` is the mean distance of that 
 voxel to all other voxels from its cluster and ``b`` is the smallest mean distance 
 of that voxel to all voxels from another cluster. As distance, e.g., the Euclidean
-distance or the correlation distance (1 - abs(corr)) is used. The silhouette 
+distance or the correlation distance ``1 - abs(corr)`` is used. The silhouette 
 coefficient of a parcellation is then the mean over all these voxel-wise 
 silhouette coefficients.
 
@@ -70,7 +70,7 @@ in chunks.
 Another issue of the silhouette coefficient is that it is computationally expensive,
 if the number of voxels is large. Therefore, the computationally less expensive 
 simplified silhouette coefficient (SSC) as introduced by Vendramin et al. (2010) 
-is implemented in spatial_silhouette module as well.
+is implemented in the spatial_silhouette module as well.
 In this variation, ``a`` is the distance of the respective voxel to the centroid
 of its cluster and ``b`` is the smallest distance of that voxel to the centroid 
 of another cluster. The distance measure is either the Euclidean distance or the correlation
@@ -82,7 +82,8 @@ information provided by the input data. However, cross-hemispheric communication
 i.e. interactions between contralateral regions on different brain hemispheres
 (Davis and Cabeza, 2015), can cause the concerned brain regions to be of high 
 similarity. As these brain regions are usually spatially discontiguous, they can
-not be merged by a spatial clustering algorithm and, therefore, reduce the
+not be merged by a spatial clustering algorithm. Thus, the ``b`` values of all voxels 
+from the corresponding regions will be small, which falsely reduces the
 SC or SSC score. Therefore, spatial adaptations of the SC and SSC as proposed 
 by Tietz et al. (2021) are implemented in the spatial_silhouette module that are 
 independent of cross-hemispheric communications. The idea is to calculate 
@@ -182,7 +183,7 @@ Vendramin L, Campello RJGB, Hruschka ER (2010) Relative clustering validity
         the ASA data science journal 3(4):209-235
         
 Davis SW, Cabeza R (2015) Cross-hemispheric collaboration and segregation associated
-        with task diculty as revealed by structural and functional connectivity.
+        with task difficulty as revealed by structural and functional connectivity.
         Journal of Neuroscience 35(21):8191-8200
         
 Tietz et al. (2021) (Publication in progress.)    
