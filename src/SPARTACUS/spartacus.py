@@ -130,6 +130,7 @@ def shac(X, matXYZ, method='ward', metric='spartacus', diag_neighbor = False,
     Tietz et al. (2021) (Publication in progress.)
         
     """ 
+    
     if metric not in _DISTANCE_METHODS:
         raise ValueError("Invalid metric: {0}".format(metric))
     if metric != "spartacus":    
