@@ -28,6 +28,13 @@ jobs:
           NUMPY: "1.15.1"
           SCIKITLEARN: "0.22.0"
           SCIPY: "1.2.0"
+          
+        - python-version: 3.6
+          installation: "highest"
+
+          NUMPY: "1.20.0"
+          SCIKITLEARN: "0.24.2"
+          SCIPY: "1.6.3"
 
         - python-version: 3.7
           installation: "lowest"
@@ -35,7 +42,14 @@ jobs:
           NUMPY: "1.15.1"
           SCIKITLEARN: "0.22.0"
           SCIPY: "1.2.0"
+        
+        - python-version: 3.7
+          installation: "highest"
 
+          NUMPY: "1.20.0"
+          SCIKITLEARN: "0.24.2"
+          SCIPY: "1.6.3"
+          
         - python-version: 3.8
           installation: "lowest"
 
@@ -43,7 +57,13 @@ jobs:
           NUMPY: "1.17.3"
           SCIKITLEARN: "0.22.0"
           SCIPY: "1.4.0"
-          
+        
+        - python-version: 3.8
+          installation: "highest"
+
+          NUMPY: "1.20.0"
+          SCIKITLEARN: "0.24.2"
+          SCIPY: "1.6.3"  
 
     steps:
     - uses: actions/checkout@v2
