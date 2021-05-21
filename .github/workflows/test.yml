@@ -32,7 +32,7 @@ jobs:
         - python-version: 3.6
           installation: "highest"
 
-          NUMPY: "1.20.0"
+          NUMPY: "1.19.5"
           SCIKITLEARN: "0.24.2"
           SCIPY: "1.6.3"
 
