@@ -57,21 +57,21 @@ is given by
 
     .. math::
     
-       s_i = \dfrac{b_i-a_i}{\max\{a_i,b_i\}},
+       s_j = \dfrac{b_j-a_j}{\max\{a_j,b_j\}},
 
 where
 
     .. math::
 
-       a_i = \dfrac{1}{|C_k|-1}\sum\limits_{\substack{\mathbf{x}_\ell \in C_k \\ \ell\neq i}}d\big(\mathbf{x}_i, \mathbf{x}_\ell\big)
+       a_j = \dfrac{1}{|C_k|-1}\sum\limits_{\substack{\mathbf{x}_\ell \in C_k \\ \ell\neq j}}d\big(\mathbf{x}_j, \mathbf{x}_\ell\big)
        
-is the average distance of :math:`\mathbf{x}_i` to all other voxels in :math:`C_k` and 
+is the average distance of :math:`\mathbf{x}_j` to all other voxels in :math:`C_k` and 
 
     .. math::
     
-       b_i = \min_{m \neq k}\dfrac{1}{|C_m|}\sum_{\mathbf{x}_\ell \in C_m}d\big(\mathbf{x}_i, \mathbf{x}_\ell\big)
+       b_j = \min_{m \neq k}\dfrac{1}{|C_m|}\sum_{\mathbf{x}_\ell \in C_m}d\big(\mathbf{x}_j, \mathbf{x}_\ell\big)
        
-is the average distance of :math:`\mathbf{x}_i` to all voxels in the closest cluster.  
+is the average distance of :math:`\mathbf{x}_j` to all voxels in the closest cluster.  
 As distance :math:`d`, e.g., the Euclidean distance or the correlation based distance
 
     .. math::
@@ -82,7 +82,7 @@ can be employed. The silhouette coefficient of :math:`\mathbf{C}_K` is then give
 
     .. math::
     
-       \text{SC} = \dfrac{1}{N}\sum_{i=1}^Ns_i.
+       \text{SC} = \dfrac{1}{N}\sum_{j=1}^Vs_j.
 
 An issue with the silhouette coefficient is that its memory consuming, if the 
 number of voxels :math:`V` is large, as it is typically the case with high-resolution 
@@ -96,19 +96,19 @@ Another issue of the silhouette coefficient is that it is computationally expens
 if :math:`V` is large. Therefore, the computationally less expensive simplified silhouette 
 coefficient (SSC) as introduced by Vendramin et al. (2010) is implemented in the
 spatial_silhouette module as well.
-In this variation, :math:`a_i` is the distance of voxel :math:`\mathbf{x}_i` to the 
+In this variation, :math:`a_j` is the distance of voxel :math:`\mathbf{x}_j` to the 
 centroid :math:`\mathbf{c}_k \in \mathbb{R}^V` of its cluster :math:`C_k`, i.e.
 
     .. math::
 
-       a_i = d(\mathbf{x}_i, \mathbf{c}_k)
+       a_j = d(\mathbf{x}_j, \mathbf{c}_k)
 
-and :math:`b_i` is the minimum of the distances of :math:`\mathbf{x}_i` to the centroids 
+and :math:`b_j` is the minimum of the distances of :math:`\mathbf{x}_j` to the centroids 
 of the other clusters, i.e.
 
     .. math::
 
-       b_i = \min_{m\neq k}d(\mathbf{x}_i,  \mathbf{c}_m).
+       b_j = \min_{m\neq k}d(\mathbf{x}_j,  \mathbf{c}_m).
         
 The distance measure :math:`d` is either the Euclidean distance or the correlation
 distance :math:`d_\text{corr}` and the centroid is either the mean over all data points 
@@ -123,7 +123,7 @@ not be merged by a spatial clustering algorithm and, therefore, reduce the
 SC or SSC score. Therefore, spatial adaptations of the SC and SSC as proposed 
 by Tietz et al. (2021) are implemented in the :code:`spatial_silhouette` module that are 
 independent of cross-hemispheric communications. The idea is to calculate 
-the :math:`b_i` value of voxel :math:`\mathbf{x}_i` belonging to cluster :math:`C_k` 
+the :math:`b_j` value of voxel :math:`\mathbf{x}_j` belonging to cluster :math:`C_k` 
 only with respect to the neighboring clusters of :math:`C_k`. 
 
 More precisely, clusters 
@@ -138,15 +138,15 @@ are neighbors, otherwise, :math:`s_{j\ell}=0`.
 The modified :math:`b_j`-value 
 
     .. math::
-       b_j^\text{spatial}=\min_{\substack{m\neq k \\s_{km}^*=1}}\dfrac{1}{|C_m|}\sum_{\bm{x}_\ell \in C_m}d\big(\mathbf{x}_j, \mathbf{x}_\ell\big)
+       b_j^\text{spatial}=\min_{\substack{m\neq k \\s_{km}^*=1}}\dfrac{1}{|C_m|}\sum_{\mathbf{x}_\ell \in C_m}d\big(\mathbf{x}_j, \mathbf{x}_\ell\big)
 
-of :math:`\bm{x}_j \in C_k` is used to calculate the spatial SC, referred to as 
+of :math:`\mathbf{x}_j \in C_k` is used to calculate the spatial SC, referred to as 
 :math:`SC_\text{spatial}`, and the modified :math:`b_j`-value 
 
     .. math:: 
        b_j^\text{spatial} = \min_{\substack{m\neq k \\s_{km}^*=1}}d(\mathbf{x}_j,  \mathbf{c}_m),
 
-of :math:`\bm{x}_j \in C_k` can be used to calculate the spatial SSC, 
+of :math:`\mathbf{x}_j \in C_k` can be used to calculate the spatial SSC, 
 referred to as :math:`SSC_\text{spatial}`.
 
 
