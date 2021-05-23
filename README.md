@@ -6,6 +6,8 @@ especially designed to cluster neuroimaging data. Moreover, implementations of
 the silhouette coefficient (SC) for large data, the simplified silhouette 
 coefficient (SSC) and spatial adaptations thereof are included as well. 
 
+To see a more detailed Read-The-Docs documentation, got to <https://spartacus10.readthedocs.io/>.
+
 ## Description of the methods
 
 ### SHAC and SEC methods 

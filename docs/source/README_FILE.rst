@@ -123,8 +123,31 @@ not be merged by a spatial clustering algorithm and, therefore, reduce the
 SC or SSC score. Therefore, spatial adaptations of the SC and SSC as proposed 
 by Tietz et al. (2021) are implemented in the :code:`spatial_silhouette` module that are 
 independent of cross-hemispheric communications. The idea is to calculate 
-the :math:`b_i` value of voxel :math:`\mathbf{x}_i` belonging to cluster :math:`C_k` only with 
-respect to the neighboring clusters of :math:`C_k`. 
+the :math:`b_i` value of voxel :math:`\mathbf{x}_i` belonging to cluster :math:`C_k` 
+only with respect to the neighboring clusters of :math:`C_k`. 
+
+More precisely, clusters 
+:math:`C_m` and :math:`C_k` are defined to be neighbors, if and only if :math:`s_{km}^*=1`, where
+
+    .. math::
+     
+       s_{km}^*= \text{I}\left(\sum_{\mathbf{x}_j\in C_k}\sum_{\mathbf{x}_\ell\in C_m}s_{j\ell}>0\right)
+
+and :math:`s_{j\ell}=1`, if :math:`\mathbf{x}_j` and :math:`\mathbf{x}_\ell` 
+are neighbors, otherwise, :math:`s_{j\ell}=0`. 
+The modified :math:`b_j`-value 
+
+    .. math::
+       b_j^\text{spatial}=\min_{\substack{m\neq k \\s_{km}^*=1}}\dfrac{1}{|C_m|}\sum_{\bm{x}_\ell \in C_m}d\big(\mathbf{x}_j, \mathbf{x}_\ell\big)
+
+of :math:`\bm{x}_j \in C_k` is used to calculate the spatial SC, referred to as 
+:math:`SC_\text{spatial}`, and the modified :math:`b_j`-value 
+
+    .. math:: 
+       b_j^\text{spatial} = \min_{\substack{m\neq k \\s_{km}^*=1}}d(\mathbf{x}_j,  \mathbf{c}_m),
+
+of :math:`\bm{x}_j \in C_k` can be used to calculate the spatial SSC, 
+referred to as :math:`SSC_\text{spatial}`.
 
 
 Installation
