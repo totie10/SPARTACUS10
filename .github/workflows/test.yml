@@ -34,7 +34,7 @@ jobs:
 
           NUMPY: "1.19.5"
           SCIKITLEARN: "0.24.2"
-          SCIPY: "1.6.3"
+          SCIPY: "1.5.4"
 
         - python-version: 3.7
           installation: "lowest"
