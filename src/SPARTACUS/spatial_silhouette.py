@@ -346,7 +346,6 @@ def get_list_neighbors(matXYZ, diag_neighbor = False, print_progress = False):
         else:
             id_neighbors = np.where(np.sum(abs(matXYZ[i,] - matXYZ), axis = 1) == 1)[0]
         list_neighbors.append(id_neighbors)
-    # Return List with neighbors
     return list_neighbors
 
 

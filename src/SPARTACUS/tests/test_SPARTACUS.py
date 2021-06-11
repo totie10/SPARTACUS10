@@ -13,8 +13,6 @@ from sklearn.cluster import AgglomerativeClustering
 
 from SPARTACUS import spatial_silhouette as spasi
 
-import sklearn.metrics as metrics
-
 import os
 
         
@@ -185,48 +183,6 @@ def test_ensemble_simple_example_single():
     # Spatial contiguous?
     list_neighbors = spasi.get_list_neighbors(matXYZ, diag_neighbor = False)
     assert is_spatial_contiguous(labels, list_neighbors), "Not spatial contiguous (ensemble single linkage)" 
-    
-def tests_for_silhouette():
-    """
-    Does silhouette_coefficient() function produce the same results as 
-    silhouette_score() function from sklearn.metrics using Euclidean metric?
-    """
-    # Test on matrixA
-    X = np.genfromtxt(find_path("matrixA.csv"), delimiter=",", skip_header=1, usecols = range(1,21))
-    V = X.shape[1]
-    for i in range(3, 11):
-        labels = np.random.randint(1, i+1, V)
-        sil_score1 = spasi.silhouette_coefficient(X, labels, metric = "euclidean", iter_max = 10)    
-        sil_score2 = metrics.silhouette_score(X.T, labels, metric = "euclidean")  
-        assert np.round(sil_score1,10) == np.round(sil_score2, 10), "Silhouette function (Euclidean) produces different results than that implemented in scikit-learn"
-    
-    # Test on random data
-    V = 100
-    X = np.random.normal(size = (10, V))
-    for i in range(3, 11):
-        labels = np.random.randint(1, i+1, V)
-        sil_score1 = spasi.silhouette_coefficient(X, labels, metric = "euclidean", iter_max = 10)    
-        sil_score2 = metrics.silhouette_score(X.T, labels, metric = "euclidean")  
-        assert np.round(sil_score1,10) == np.round(sil_score2, 10), "Silhouette function (Euclidean) produces different results than that implemented in scikit-learn"
-    
-    
-def tests_for_ensemble_silhouette():
-    X = np.array([[1,1,2,2,3,3,4,4],
-                      [1,1,2,2,3,3,4,4],
-                      [1,1,2,2,3,3,4,4],
-                      [1,1,2,2,5,5,6,6],
-                      [1,1,1,2,3,3,3,4],
-                      [1,1,1,2,3,3,3,4]])   
-    labels = [1,1,2,2,3,3,4,4]
-    assert spasi.silhouette_coefficient(X[0:4,], labels, metric = "jaccard", iter_max = 4) == 1, "Ensemble silhouette produces wrong results"
-    sil_score1 = spasi.silhouette_coefficient(X, labels, metric = "jaccard", iter_max = 4)
-    assert np.round(sil_score1, 8) == 0.79166667, "Ensemble silhouette produces wrong results"
-    X1 = np.array([[1,1,2,2], [1,2,2,2], [1,1,1,2]])
-    labels1 = [1,1,2,2]
-    sil_score2 = spasi.silhouette_coefficient(X1, labels1, metric = "jaccard", iter_max = 4) 
-    assert np.round(sil_score2, 8) == 0.46666667, "Ensemble silhouette produces wrong results"
-    
-# def test_spatial_silhouette():   
     
     
     
