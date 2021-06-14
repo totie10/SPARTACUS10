@@ -1,4 +1,4 @@
-# SPARTACUS
+# SPARTACUS10
 Includes functions to perform spatial hierarchical agglomerative clustering (SHAC),
 including SPARTACUS (SPAtial hieRarchical agglomeraTive vAriable ClUStering), 
 as well as spatially constrained ensemble clustering (SEC). These functions are 
