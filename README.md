@@ -46,7 +46,7 @@ distance can be used as distance measure for clusters in a SHAC algorithm as
 introduced by Tietz et al. (2021), in order to obtain a final ensemble parcellation 
 based on a cluster ensemble. 
 
-The SHAC and SEC methods are implemented in the spartacus module from the SPARTACUS
+The SHAC and SEC methods are implemented in the spartacus module from the SPARTACUS10
 package.
 
 ### Silhouette coefficient and its adaptations
@@ -64,7 +64,7 @@ silhouette coefficients.
 An issue with the silhouette coefficient is that its memory consuming, if the 
 number of voxels is large, as it is typically the case with high-resolution 
 neuroimages. In order to avoid running into a memory error, the module 
-spatial_silhouette from the SPARTACUS package includes an implementation 
+spatial_silhouette from the SPARTACUS10 package includes an implementation 
 of the silhouette coefficient for large data sets that avoids to run into a memory 
 error, by calculating the pairwise distances between voxels not all at once, but 
 in chunks. 
@@ -95,21 +95,21 @@ the cluster this voxel belongs to.
 
 ## Installation
 
-You can install the SPARTACUS package from [PyPI](https://pypi.org/project/SPARTACUS/):
+You can install the SPARTACUS10 package from [PyPI](https://pypi.org/project/SPARTACUS10/):
 
 ```bash
-pip install SPARTACUS
+pip install SPARTACUS10
 ```
 
-SPARTACUS is supported on Python 3.6 and above.
+SPARTACUS10 is supported on Python 3.6 and above.
 
 ## How to use
 
 You can call the SHAC and SEC functions in your own Python code, by importing 
-from the `SPARTACUS` package:
+from the `SPARTACUS10` package:
 
 ```python
-from SPARTACUS import spartacus
+from SPARTACUS10 import spartacus
 ```
 
 Example to perform SPARTACUS method, i.e. random input data with V = 24 spatial 
@@ -156,10 +156,10 @@ array([1, 1, 1, 1, 2, 2, 2, 2])
 ```    
 
 You can call the SC, SSC and spatial adaptations thereof in your own Python code, 
-by importing from the `SPARTACUS` package:
+by importing from the `SPARTACUS10` package:
 
 ```python
-from SPARTACUS import spatial_silhouette
+from SPARTACUS10 import spatial_silhouette
 ```
 
 Example evaluation using the silhouette coefficient of randomly generated input 
@@ -182,7 +182,7 @@ To run all the tests run
 py.test 
 ```
 
-from the SPARTACUS directory (installed in side_packages). 
+from the SPARTACUS10 directory (installed in side_packages). 
     
 ## References
 
