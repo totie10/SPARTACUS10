@@ -184,6 +184,9 @@ def test_ensemble_simple_example_single():
     list_neighbors = spasi.get_list_neighbors(matXYZ, diag_neighbor = False)
     assert is_spatial_contiguous(labels, list_neighbors), "Not spatial contiguous (ensemble single linkage)" 
     
+
+# def test_get_dist_spartacus():
+#     get_dist_spartacus(X, clus_i, clus_j, lambda_i, lambda_j)
     
     
     
