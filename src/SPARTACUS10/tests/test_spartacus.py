@@ -6,12 +6,12 @@ import numpy as np
 
 import scipy.cluster.hierarchy as hierarchy
 
-from SPARTACUS import spartacus as sp
+from SPARTACUS10 import spartacus as sp
 
 from sklearn.feature_extraction.image import grid_to_graph
 from sklearn.cluster import AgglomerativeClustering
 
-from SPARTACUS import spatial_silhouette as spasi
+from SPARTACUS10 import spatial_silhouette as spasi
 
 import os
 

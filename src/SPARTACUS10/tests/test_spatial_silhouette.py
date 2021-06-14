@@ -1,12 +1,11 @@
 
-# from SPARTACUS.cli import main
 import pytest
 
 import numpy as np
 
 import pandas as pd
 
-from SPARTACUS import spatial_silhouette as spasi
+from SPARTACUS10 import spatial_silhouette as spasi
 
 import sklearn.metrics as metrics
 

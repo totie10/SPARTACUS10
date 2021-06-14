@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'SPARTACUS'
+project = 'SPARTACUS10'
 copyright = '2021, Tobias Tietz'
 author = 'Tobias Tietz'
 

@@ -18,7 +18,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name='SPARTACUS10',
-    version='0.1.7',
+    version='0.0.1',
     license='MIT',
     description='A package to perform spatial hierarchical agglomerative clustering as well as spatially constrained ensemble clustering. Further includes implementations of the silhouette coefficient, the simplified silhouette coefficient and spatial adaptations thereof.',
     long_description=README,
