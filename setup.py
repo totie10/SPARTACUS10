@@ -17,7 +17,7 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 setup(
-    name='SPARTACUS',
+    name='SPARTACUS10',
     version='0.1.7',
     license='MIT',
     description='A package to perform spatial hierarchical agglomerative clustering as well as spatially constrained ensemble clustering. Further includes implementations of the silhouette coefficient, the simplified silhouette coefficient and spatial adaptations thereof.',
@@ -56,7 +56,7 @@ setup(
         'Topic :: Utilities',
     ],
     project_urls={
-        # 'Documentation': 'https://SPARTACUS.readthedocs.io/',
+        'Documentation': 'https://spartacus10.readthedocs.io/',
         # 'Changelog': 'https://SPARTACUS.readthedocs.io/en/latest/changelog.html',
         # 'Issue Tracker': 'https://github.com/totie10/SPARTACUS/issues',
     },
@@ -65,11 +65,11 @@ setup(
     ],
     python_requires='>=3.6',
     install_requires=[# TODO versioning
-        "numpy", "scipy", "scikit-learn"
+        "numpy>=1.15.1", "scipy>=1.2.0", "scikit-learn>=0.22.0"
         # eg: 'aspectlib==1.1.1', 'six>=1.7',
     ],
     extras_require={# Put here requires needed for testing
-                    'dev': ['pytest']
+                    'dev': ['pytest', 'pandas>=0.18.1']
         # eg:
         #   'rst': ['docutils>=0.11'],
         #   ':python_version=="2.6"': ['argparse'],
