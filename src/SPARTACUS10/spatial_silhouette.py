@@ -25,7 +25,7 @@ import numpy as np
 import scipy.spatial.distance as distance
 from sklearn.decomposition import PCA
 
-def silhouette_coefficient(X, labels, metric = "euclidean", iter_max = 20000,
+def silhouette_coefficient(X: np.ndarray, labels: np.ndarray, metric = "euclidean", iter_max = 20000,
                            return_vec_sil = False):
     """
     Calculates silhouette coefficient. For large data sets, pairwise distance 
@@ -83,56 +83,47 @@ def silhouette_coefficient(X, labels, metric = "euclidean", iter_max = 20000,
         mathematics 20:53-65
         
     """
-    # Determine labels indicating different clusters
+
+    # get_silhouette_width_of_single_variable
+    # get_average_silhouette_width_of_cluster
+
+
     unique_labels = np.unique(labels)
-    # Initiate vec_s
-    vec_s = np.array([])
-    # For each cluster
-    for l in np.nditer(unique_labels):
-        # ID voxels belongig to cluster l
-        id_vox_l = np.where(labels == l)[0]
-        # Get number of voxels in Cluster l
-        n_voxels_l = id_vox_l.shape[0]
-        # Calculate data matrix of cluster l
-        if id_vox_l.shape[0] == 1:
-            vec_s = np.append(vec_s, 0)
+    silhouette_width_of_single_voxel = np.array([])
+    for cluster in np.nditer(unique_labels):
+        voxelsBelongingToCluster = np.where(labels == cluster)[0]
+        numberVoxelsInCluster = voxelsBelongingToCluster.shape[0]
+        if numberVoxelsInCluster == 1:
+            silhouette_width_of_single_voxel = np.append(silhouette_width_of_single_voxel, 0)
             continue
         else:
-            X_l = X[:, id_vox_l]
-        #### Divide voxels in cluster l in groups of maximum size = iter_max.
-        # Get number of groups
-        n_groups_l = int(np.ceil(np.array([n_voxels_l / iter_max])))
-        # Initiate vec_a
-        vec_a = np.zeros(n_voxels_l)
+            dataMatrixOfCluster = X[:, voxelsBelongingToCluster]
+        #### Calculate a. Therefore:
+        #### Divide voxels in cluster into groups of maximum size equal to iter_max.
+        numberOfGroups = int(np.ceil(np.array([numberVoxelsInCluster / iter_max])))
+        meanWithinClusterDistances = np.zeros(numberVoxelsInCluster) # a
         # Compare each group with each group
-        for i in range(n_groups_l):
-            i_from = (i * iter_max)
-            i_to = (np.min(((i + 1) * iter_max, n_voxels_l)))
-            X_l_i = X_l[:, i_from:i_to]
-            if metric == "correlation":
-                tmp_mat = distance.squareform(distance.pdist(X_l_i.T, metric = metric))
-                vec_scores = np.sum(1 - np.abs(1-tmp_mat), 0)
-            else:
-                vec_scores = np.sum(distance.squareform(distance.pdist(X_l_i.T, metric = metric)),0)
-            vec_a[i_from:i_to] = vec_a[i_from:i_to] + vec_scores
-            for j in range(i+1, n_groups_l):
-                j_from = (j * iter_max)
-                j_to = (np.min(((j + 1) * iter_max, n_voxels_l)))
-                X_l_j = X_l[:, j_from:j_to]
-                mat_dist_ij = distance.cdist(X_l_i.T, X_l_j.T, metric = metric)
-                if metric == "correlation":
-                    mat_dist_ij = 1 - np.abs(1-mat_dist_ij)
-                vec_a[i_from:i_to] = vec_a[i_from:i_to] + np.sum(mat_dist_ij, 1)
-                vec_a[j_from:j_to] = vec_a[j_from:j_to] + np.sum(mat_dist_ij, 0)
-        # Calculate vector with within distances 
-        vec_a = vec_a/(n_voxels_l - 1)
-        #### Calculate vec_b
+        for group1 in range(numberOfGroups):
+            firstVoxelFromGroup1 = (group1 * iter_max)
+            lastVoxelFromGroup1 = (np.min(((group1 + 1) * iter_max, numberVoxelsInCluster)))
+            dataMatrixOfGroup1 = dataMatrixOfCluster[:, firstVoxelFromGroup1:lastVoxelFromGroup1]
+            meanWithinGroup1Distances = getMeanWithinClusterDistances(dataMatrixOfGroup1, metric)
+            meanWithinClusterDistances[firstVoxelFromGroup1:lastVoxelFromGroup1] += meanWithinGroup1Distances
+            for group2 in range(group1+1, numberOfGroups):
+                firstVoxelFromGroup2 = (group2 * iter_max)
+                lastVoxelFromGroup2 = (np.min(((group2 + 1) * iter_max, numberVoxelsInCluster)))
+                dataMatrixOfGroup2 = dataMatrixOfCluster[:, firstVoxelFromGroup2:lastVoxelFromGroup2]
+                meanBetweenGroupDistances = getMeanBetweenClusterDistances(dataMatrixOfGroup1, dataMatrixOfGroup2, metric)
+                meanWithinClusterDistances[firstVoxelFromGroup1:lastVoxelFromGroup1] += np.sum(meanBetweenGroupDistances, 1)
+                meanWithinClusterDistances[firstVoxelFromGroup2:lastVoxelFromGroup2] += np.sum(meanBetweenGroupDistances, 0) 
+        meanWithinClusterDistances = meanWithinClusterDistances/(numberVoxelsInCluster - 1)
+        #### Calculate b
         # Initiate mat_b to later calculate column min from
-        mat_b = np.zeros((unique_labels.shape[0] - 1, n_voxels_l))
+        mat_b = np.zeros((unique_labels.shape[0] - 1, numberVoxelsInCluster))
         # Initiate counter
         counter = 0
         for h in np.nditer(unique_labels):
-            if h == l:
+            if h == cluster:
                 continue
             # ID voxels belongig to cluster h
             id_vox_h = np.where(labels == h)[0]
@@ -146,20 +137,20 @@ def silhouette_coefficient(X, labels, metric = "euclidean", iter_max = 20000,
             # Get number of groups for cluster h
             n_groups_h = int(np.ceil(np.array([n_voxels_h / iter_max])))
             # Compare each group with each group
-            for i in range(n_groups_l):
-                i_from = (i * iter_max)
-                i_to = (np.min(((i + 1) * iter_max, n_voxels_l)))
-                X_l_i = X_l[:, i_from:i_to]
-                for j in range(n_groups_h):
-                    j_from = (j * iter_max)
-                    j_to = (np.min(((j + 1) * iter_max, n_voxels_h)))
-                    X_h_j = X_h[:, j_from:j_to]
+            for group1 in range(numberOfGroups):
+                firstVoxelFromGroup1 = (group1 * iter_max)
+                lastVoxelFromGroup1 = (np.min(((group1 + 1) * iter_max, numberVoxelsInCluster)))
+                dataMatrixOfGroup1 = dataMatrixOfCluster[:, firstVoxelFromGroup1:lastVoxelFromGroup1]
+                for group2 in range(n_groups_h):
+                    firstVoxelFromGroup2 = (group2 * iter_max)
+                    lastVoxelFromGroup2 = (np.min(((group2 + 1) * iter_max, n_voxels_h)))
+                    X_h_j = X_h[:, firstVoxelFromGroup2:lastVoxelFromGroup2]
                     if metric == "correlation":
-                        tmp_mat = distance.cdist(X_l_i.T, X_h_j.T, metric = metric)
+                        tmp_mat = distance.cdist(dataMatrixOfGroup1.T, X_h_j.T, metric = metric)
                         vec_scores = np.sum(1 - np.abs(1-tmp_mat), 1)
                     else:
-                        vec_scores = np.sum(distance.cdist(X_l_i.T, X_h_j.T, metric = metric), 1)
-                    mat_b[counter, i_from:i_to] = mat_b[counter, i_from:i_to] + vec_scores
+                        vec_scores = np.sum(distance.cdist(dataMatrixOfGroup1.T, X_h_j.T, metric = metric), 1)
+                    mat_b[counter, firstVoxelFromGroup1:lastVoxelFromGroup1] = mat_b[counter, firstVoxelFromGroup1:lastVoxelFromGroup1] + vec_scores
             # Calculate matrix with between distances
             mat_b[counter, :] = mat_b[counter, :] / n_voxels_h
             # Update counter
@@ -167,15 +158,64 @@ def silhouette_coefficient(X, labels, metric = "euclidean", iter_max = 20000,
         # Calculate vector with between distance
         vec_b = np.min(mat_b, 0)
         # Calculate s
-        vec_s_l = (vec_b - vec_a) / np.maximum(vec_a, vec_b)
-        # Update vec_s
-        vec_s = np.append(vec_s, vec_s_l)
+        vec_s_l = (vec_b - meanWithinClusterDistances) / np.maximum(meanWithinClusterDistances, vec_b)
+        silhouette_width_of_single_voxel = np.append(silhouette_width_of_single_voxel, vec_s_l)
     # Return silhouette index
-    SC = np.mean(vec_s)
+    SC = np.mean(silhouette_width_of_single_voxel)
     if return_vec_sil:
-        return SC, vec_s
+        return SC, silhouette_width_of_single_voxel
     else:
         return SC
+
+def getMeanWithinClusterDistances(dataMatrixOfCluster: np.ndarray, metric: str) -> np.ndarray:
+    """  
+    Calculates for each voxel from the cluster the mean distance to all other
+    voxels from the cluster. 
+
+    Parameters
+    ----------
+    dataMatrixOfCluster : ndarray, shape(N, V_cluster)
+        Input matrix including, e.g., grey matter volume values, where N is the 
+        number of subjects and V_cluster is the number of voxels in that cluster. 
+    metric : str
+        The distance metric between two voxels. It is recommended to either
+        employ 'euclidean' (Euclidean distance) or 'correlation' (1-abs(corr)).
+        However, this function technically allows all distance metrics as 
+        implemented in ?scipy.spatial.distance.pdist. In the latter case, it is 
+        up to the user to ensure the validity of the chosen metric. 
+    """
+    if metric == "correlation":
+        tmp_mat = distance.squareform(distance.pdist(dataMatrixOfCluster.T, metric = metric))
+        return np.sum(1 - np.abs(1-tmp_mat), 0)
+    else:
+        return np.sum(distance.squareform(distance.pdist(dataMatrixOfCluster.T, metric = metric)),0)
+
+
+def getMeanBetweenClusterDistances(dataMatrixOfCluster1: np.ndarray, dataMatrixOfCluster2: np.ndarray, metric: str) -> np.ndarray:
+    """  
+    Calculates for each voxel from the first cluster the mean distance to all 
+    voxels from the second cluster. 
+
+    Parameters
+    ----------
+    dataMatrixOfCluster1 : ndarray, shape(N, V_cluster1)
+        Input matrix of the first cluster, where N is the 
+        number of subjects and V_cluster1 is the number of voxels in that cluster.
+    dataMatrixOfCluster2 : ndarray, shape(N, V_cluster2)
+        Input matrix of the second cluster, where N is the 
+        number of subjects and V_cluster2 is the number of voxels in that cluster.
+    metric : str
+        The distance metric between two variables. It is recommended to either
+        employ 'euclidean' (Euclidean distance) or 'correlation' (1-abs(corr)).
+        However, this function technically allows all distance metrics as 
+        implemented in ?scipy.spatial.distance.pdist. In the latter case, it is 
+        up to the user to ensure the validity of the chosen metric. 
+    """
+
+    matDist = distance.cdist(dataMatrixOfCluster1.T, dataMatrixOfCluster2.T, metric = metric)
+    if metric == "correlation":
+        matDist = 1 - np.abs(1-matDist)
+    return matDist
 
 def simplified_silhouette_coefficient(X, labels, metric = "euclidean",
                                       return_vec_sil = False):
